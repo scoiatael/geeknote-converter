@@ -1,47 +1,72 @@
-{-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes #-}
 module Lib
     ( fromEnml
+    , fromEnNote
     , toEnml
+    , toEnNoteBody
+    , Enml
+    , Markdown
     ) where
 
 
 import Data.Text(Text)
 import qualified Data.Text as T
-import Data.Text.Encoding(encodeUtf8)
-import CMark(nodeToHtml, commonmarkToNode, Node(..), nodeToCommonmark, NodeType(..))
-import Xeno.SAX(process)
-import Control.Monad.Trans.State.Strict(execState, StateT)
-import Data.Functor.Identity(Identity)
+import qualified Data.Text.Lazy as L
+import CMark(nodeToHtml, commonmarkToNode, nodeToCommonmark)
+import qualified CMark
 import Text.RawString.QQ
+
+import qualified Text.XML as XML
 
 type Enml = Text
 type Markdown = Text
 
-toEnml :: Markdown -> Enml
-toEnml = wrapXml . dump . commonmarkToNode []
+xmlVersion :: Enml
+xmlVersion = [r|<?xml version="1.0" encoding="UTF-8"?>|]
+
+enmlDoctype :: Enml
+enmlDoctype = [r|<!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd">|]
+
+openEnNote :: Enml
+openEnNote = [r|<en-note>|]
+
+closeEnNote :: Enml
+closeEnNote = [r|</en-note>|]
+
+toEnNoteBody :: Markdown -> Enml
+toEnNoteBody = dump . commonmarkToNode []
   where
     dump = nodeToHtml []
+
+toEnml :: Markdown -> Enml
+toEnml = wrapXml . toEnNoteBody
+  where
     wrapXml t = T.unlines [xmlVersion, enmlDoctype, T.concat [openEnNote, t, closeEnNote]]
 
-    xmlVersion = [r|<?xml version="1.0" encoding="UTF-8"?>|]
-    enmlDoctype = [r|<!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd">|]
-    openEnNote = [r|<en-note>|]
-    closeEnNote = [r|</en-note>|]
+convert :: XML.Document -> CMark.Node
+convert (XML.Document _pro root _epi) = goRoot root
 
-type EnmlDecoder = StateT Node Identity
-fromEnml :: Enml -> Markdown
-fromEnml = dump . execWithInitialNode . transformXml . encodeUtf8
+goRoot :: XML.Element -> CMark.Node
+goRoot (XML.Element _name _attrs children) = CMark.Node Nothing CMark.DOCUMENT (concatMap goNode children)
+
+goNode :: XML.Node -> [CMark.Node]
+goNode (XML.NodeElement e) = goElem e
+goNode (XML.NodeContent t) = [CMark.Node Nothing (CMark.TEXT t) []]
+goNode (XML.NodeComment _) = []
+goNode (XML.NodeInstruction _) = []
+
+goElem :: XML.Element -> [CMark.Node]
+goElem (XML.Element "ul" _attrs children) = [CMark.Node Nothing (CMark.LIST lsAttr) (concatMap goNode children)]
+  where lsAttr = CMark.ListAttributes CMark.BULLET_LIST True 0 CMark.PERIOD_DELIM
+goElem (XML.Element "li" _attrs children) = [CMark.Node Nothing CMark.ITEM (concatMap goNode children)]
+goElem (XML.Element _name _attrs children) = concatMap goNode children
+
+fromEnNote :: Enml -> Markdown
+fromEnNote = dump . convert . parse
   where
-    execWithInitialNode = flip execState $ initialNode
-    initialNode = Node Nothing DOCUMENT []
     dump = nodeToCommonmark [] Nothing
+    parse = XML.parseText_ XML.def . L.fromStrict
 
-    transformXml = process onOpenTag onTagAttr onEndTag onText onCloseTag onCData
-
-    onOpenTag _ = return ()
-    onTagAttr _ _ = return ()
-    onEndTag _ = return ()
-    onText _ = return ()
-    onCloseTag _ = return ()
-    onCData _ = return ()
+fromEnml :: Enml -> Markdown
+fromEnml = fromEnNote
