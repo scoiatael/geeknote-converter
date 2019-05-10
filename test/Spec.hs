@@ -14,6 +14,12 @@ prelude = [r|<?xml version="1.0" encoding="UTF-8"?>
 emptyDoc :: Enml
 emptyDoc = T.concat [prelude, [r|<en-note></en-note>|], "\n"]
 
+xmlList :: Enml
+xmlList = "<ul>\n<li>1</li>\n<li>2</li>\n<li>3</li>\n</ul>\n"
+
+mdList :: Markdown
+mdList = "  - 1\n  - 2\n  - 3\n"
+
 main :: IO ()
 main = hspec $ do
   describe "toENML" $ do
@@ -26,8 +32,8 @@ main = hspec $ do
 
   describe "toEnNoteBody" $ do
     it "converts Md unordered list" $
-      toEnNoteBody "* 1\n* 2\n*3" `shouldBe` "<ul>\n<li>1</li>\n<li>2\n*3</li>\n</ul>\n"
+      toEnNoteBody mdList `shouldBe` xmlList
 
   describe "fromEnNote" $ do
     it "converts Html unordered list" $ do
-      fromEnNote "<en-note><ul>\n<li>1</li>\n<li>2\n*3</li>\n</ul>\n</en-note>" `shouldBe` "* 1\n* 2\n*3"
+      fromEnNote (T.concat ["<en-note>", xmlList, "</en-note>"]) `shouldBe` mdList

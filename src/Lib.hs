@@ -19,6 +19,12 @@ import Text.RawString.QQ
 
 import qualified Text.XML as XML
 
+-- import Debug.Trace as Debug
+
+debug :: Show a => String -> a -> a
+-- debug msg a = Debug.trace (msg ++ " " ++ show a) a
+debug _ = id
+
 type Enml = Text
 type Markdown = Text
 
@@ -35,7 +41,7 @@ closeEnNote :: Enml
 closeEnNote = [r|</en-note>|]
 
 toEnNoteBody :: Markdown -> Enml
-toEnNoteBody = dump . commonmarkToNode []
+toEnNoteBody = dump . debug "toEnNoteBody" .commonmarkToNode []
   where
     dump = nodeToHtml []
 
@@ -52,7 +58,8 @@ goRoot (XML.Element _name _attrs children) = CMark.Node Nothing CMark.DOCUMENT (
 
 goNode :: XML.Node -> [CMark.Node]
 goNode (XML.NodeElement e) = goElem e
-goNode (XML.NodeContent t) = [CMark.Node Nothing (CMark.TEXT t) []]
+goNode (XML.NodeContent "\n") = []
+goNode (XML.NodeContent t) = [CMark.Node Nothing CMark.PARAGRAPH [CMark.Node Nothing (CMark.TEXT t) []]]
 goNode (XML.NodeComment _) = []
 goNode (XML.NodeInstruction _) = []
 
@@ -63,7 +70,7 @@ goElem (XML.Element "li" _attrs children) = [CMark.Node Nothing CMark.ITEM (conc
 goElem (XML.Element _name _attrs children) = concatMap goNode children
 
 fromEnNote :: Enml -> Markdown
-fromEnNote = dump . convert . parse
+fromEnNote = dump . convert . debug "fromEnNote" . parse
   where
     dump = nodeToCommonmark [] Nothing
     parse = XML.parseText_ XML.def . L.fromStrict
