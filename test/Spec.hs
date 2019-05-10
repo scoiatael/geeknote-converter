@@ -31,9 +31,15 @@ main = hspec $ do
       fromEnml emptyDoc `shouldBe` "\n"
 
   describe "toEnNoteBody" $ do
-    it "converts Md unordered list" $
+    it "converts unordered list" $
       toEnNoteBody mdList `shouldBe` xmlList
 
+    it "converts paragraph" $
+      toEnNoteBody "A paragraph\n" `shouldBe`  "<p>A paragraph</p>\n"
+
   describe "fromEnNote" $ do
-    it "converts Html unordered list" $ do
+    it "converts unordered list" $ do
       fromEnNote (T.concat ["<en-note>", xmlList, "</en-note>"]) `shouldBe` mdList
+
+    it "converts paragraph" $
+      fromEnNote "<p>A paragraph</p>\n" `shouldBe` "A paragraph\n"
