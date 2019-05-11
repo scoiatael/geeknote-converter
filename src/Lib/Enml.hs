@@ -3,8 +3,8 @@ module Lib.Enml
     ( toNode
     ) where
 
+import qualified Data.Map as M
 import Data.Text(Text)
-import qualified Data.Text as T
 import qualified CMark
 import qualified Text.XML as XML
 
@@ -40,5 +40,6 @@ goElem (XML.Element "ul" _attrs children) =
   return . CMark.Node Nothing (CMark.LIST lsAttr) . concat <$> mapM goNode children
   where lsAttr = CMark.ListAttributes CMark.BULLET_LIST True 0 CMark.PERIOD_DELIM
 goElem (XML.Element "li" _attrs children) = return . CMark.Node Nothing CMark.ITEM . concat <$> mapM goNode children
+goElem (XML.Element "en-todo" attrs _children) | "checked" `M.lookup` attrs == Just "true" = State.put "[x]" >> return []
 goElem (XML.Element "en-todo" _attrs _children) = State.put "[ ]" >> return []
 goElem (XML.Element _name _attrs children) = concat <$> mapM goNode children

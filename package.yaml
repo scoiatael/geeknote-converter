@@ -28,6 +28,7 @@ dependencies:
 - cli
 - raw-strings-qq
 - xml-conduit
+- containers
 
 library:
   source-dirs: src

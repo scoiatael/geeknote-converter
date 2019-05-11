@@ -58,3 +58,6 @@ main = hspec $ do
 
     it "converts checklist" $
       fromEnNote (note xmlChecklist) `shouldBe` mdChecklist
+
+    it "converts checked checklist" $
+      fromEnNote (note [r|<ul><li><en-todo checked="true"/> item1</li></ul>|]) `shouldBe` "  - [x] item1\n"
