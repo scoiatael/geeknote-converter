@@ -64,3 +64,6 @@ main = hspec $ do
 
     it "converts checked checklist" $
       fromEnNote (note [r|<ul><li><en-todo checked="true"/> item1</li></ul>|]) `shouldBe` "  - [x] item1\n"
+
+    it "works with paragraph after checklist" $
+      fromEnNote (note [r|<ul><li><en-todo/> item1</li></ul><p>paragraph</p>|]) `shouldBe` "  - [ ] item1\n\nparagraph\n"

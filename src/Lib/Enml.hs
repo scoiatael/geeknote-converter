@@ -24,14 +24,15 @@ goRoot (XML.Element _name _attrs children) = CMark.Node Nothing CMark.DOCUMENT .
 goNode :: XML.Node -> Converter [CMark.Node]
 goNode (XML.NodeElement e) = goElem e
 goNode (XML.NodeContent "\n") = return []
-goNode (XML.NodeContent t) = State.get >>=
-  \pre ->
-    return [
-    CMark.Node Nothing CMark.PARAGRAPH [
-        CMark.Node Nothing (CMark.CUSTOM_INLINE pre "") [],
-        CMark.Node Nothing (CMark.TEXT t) []
+goNode (XML.NodeContent t) = buildWithPrefix <$> State.get >>= resetState
+  where
+    buildWithPrefix pre =
+      [ CMark.Node Nothing CMark.PARAGRAPH
+        [ CMark.Node Nothing (CMark.CUSTOM_INLINE pre "") []
+        , CMark.Node Nothing (CMark.TEXT t) []
         ]
-    ]
+      ]
+    resetState v = State.put "" >> return v
 goNode (XML.NodeComment _) = return []
 goNode (XML.NodeInstruction _) = return []
 
