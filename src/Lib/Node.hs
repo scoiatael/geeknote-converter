@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE QuasiQuotes #-}
 module Lib.Node
     ( toEnml
     ) where
@@ -7,6 +8,7 @@ module Lib.Node
 import Data.Text(Text)
 import qualified Data.Text as T
 import CMark(Node(..), NodeType(..))
+import Text.RawString.QQ
 
 -- TODO: Maybe Reader would suffice?
 import Control.Monad.Trans.State.Strict(evalStateT, StateT)
@@ -32,6 +34,7 @@ convert (Node _pos PARAGRAPH children) = T.concat <$> (mapM convert children >>=
 
 convert (Node _pos (TEXT t) children) = T.concat . ([convertText t]++) <$> mapM convert children
   where
+    convertText (T.stripPrefix "[x]" -> Just t') = [r|<en-todo checked="true"/>|] `T.append` t'
     convertText (T.stripPrefix "[ ]" -> Just t') = "<en-todo/>" `T.append` t'
     convertText t' = t'
 convert (Node _pos (LIST _lsAttr) children) = State.withStateT (const InList) conversion
