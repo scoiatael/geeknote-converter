@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ViewPatterns #-}
 module Lib.Node
     ( toEnml
     ) where
@@ -23,13 +24,16 @@ type Converter = StateT ConverterState Identity
 
 convert :: Node -> Converter Text
 convert (Node _pos DOCUMENT children) = T.concat <$> mapM convert children
-convert (Node _pos PARAGRAPH children) = T.concat <$> ((mapM convert children) >>= wrap)
+convert (Node _pos PARAGRAPH children) = T.concat <$> (mapM convert children >>= wrap)
   where
     wrap ch = maybeWrap ch <$> State.get
     maybeWrap ch Blank = ["<p>"] ++ ch ++ ["</p>\n"]
     maybeWrap ch InList = ch
 
-convert (Node _pos (TEXT t) children) = T.concat . ([t]++) <$> mapM convert children
+convert (Node _pos (TEXT t) children) = T.concat . ([convertText t]++) <$> mapM convert children
+  where
+    convertText (T.stripPrefix "[ ]" -> Just t') = "<en-todo/>" `T.append` t'
+    convertText t' = t'
 convert (Node _pos (LIST _lsAttr) children) = State.withStateT (const InList) conversion
   where
     conversion = T.concat . (["<ul>\n"]++) .  (++ ["</ul>\n"]) <$> mapM convert children
