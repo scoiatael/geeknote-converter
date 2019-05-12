@@ -70,3 +70,6 @@ main = hspec $ do
 
     it "works with paragraph after checklist" $
       fromEnNote (note [r|<ul><li><en-todo/> item1</li></ul><p>paragraph</p>|]) `shouldBe` "  - [ ] item1\n\nparagraph\n"
+
+    it "converts header" $
+      fromEnNote (note "<h1>A header</h1>\n")`shouldBe` "# A header\n"
