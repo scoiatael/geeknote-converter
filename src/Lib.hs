@@ -50,7 +50,7 @@ toEnml = wrapXml . toEnNoteBody
     wrapXml t = T.unlines [xmlVersion, enmlDoctype, T.concat [openEnNote, t, closeEnNote]]
 
 fromEnNote :: Enml -> Markdown
-fromEnNote = dump . Enml.toNode . debug "fromEnNote" . parse
+fromEnNote = dump . debug "fromEnNote: after toNode" . Enml.toNode . debug "fromEnNote: after parse" . parse
   where
     dump = nodeToCommonmark [] Nothing
     parse = XML.parseText_ XML.def . L.fromStrict
