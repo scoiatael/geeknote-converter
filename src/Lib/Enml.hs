@@ -43,5 +43,7 @@ goElem (XML.Element "li" _attrs children) =
 goElem (XML.Element "en-todo" attrs _children) | "checked" `M.lookup` attrs == Just "true" = State.put "[x]" >> return []
 goElem (XML.Element "en-todo" _attrs _children) = State.put "[ ]" >> return []
 goElem (XML.Element "h1" _attrs children) = return . CMark.Node Nothing (CMark.HEADING 1) . concat <$> mapM goNode children
+goElem (XML.Element "h2" _attrs children) = return . CMark.Node Nothing (CMark.HEADING 2) . concat <$> mapM goNode children
+goElem (XML.Element "h3" _attrs children) = return . CMark.Node Nothing (CMark.HEADING 3) . concat <$> mapM goNode children
 goElem (XML.Element "p" _attrs children) = return . CMark.Node Nothing CMark.PARAGRAPH . concat <$> mapM goNode children
 goElem (XML.Element _name _attrs children) = concat <$> mapM goNode children

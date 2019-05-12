@@ -55,6 +55,12 @@ main = hspec $ do
     it "converts header" $
       toEnNoteBody "# A header\n" `shouldBe`  "<h1>A header</h1>\n"
 
+    it "converts sub-header" $
+      toEnNoteBody "## A header\n" `shouldBe`  "<h2>A header</h2>\n"
+
+    it "converts sub-sub-header" $
+      toEnNoteBody "### A header\n" `shouldBe`  "<h3>A header</h3>\n"
+
   describe "fromEnNote" $ do
     it "converts unordered list" $ do
       fromEnNote (note xmlList) `shouldBe` mdList
@@ -73,3 +79,9 @@ main = hspec $ do
 
     it "converts header" $
       fromEnNote (note "<h1>A header</h1>\n")`shouldBe` "# A header\n"
+
+    it "converts sub-header" $
+      fromEnNote (note "<h2>A header</h2>\n")`shouldBe` "## A header\n"
+
+    it "converts sub-sub-header" $
+      fromEnNote (note "<h3>A header</h3>\n")`shouldBe` "### A header\n"
