@@ -41,3 +41,6 @@ convert (Node _pos (LIST _lsAttr) children) = State.withStateT (const InList) co
   where
     conversion = T.concat . (["<ul>\n"]++) .  (++ ["</ul>\n"]) <$> mapM convert children
 convert (Node _pos ITEM children) = T.concat . (["<li>"]++) .  (++ ["</li>\n"]) <$> mapM convert children
+convert (Node _pos (HEADING _level) children) =
+  T.concat . (["<h1>"]++) .  (++ ["</h1>\n"]) <$> mapM convert children
+convert (Node _pos _type children) = T.concat <$> mapM convert children

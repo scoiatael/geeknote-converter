@@ -52,6 +52,9 @@ main = hspec $ do
     it "converts checked checklist" $
       toEnNoteBody "  - [x] item1\n" `shouldBe` T.concat ["<ul>\n<li>", [r|<en-todo checked="true"/> item1|], "</li>\n</ul>\n"]
 
+    it "converts header" $
+      toEnNoteBody "# A header\n" `shouldBe`  "<h1>A header</h1>\n"
+
   describe "fromEnNote" $ do
     it "converts unordered list" $ do
       fromEnNote (note xmlList) `shouldBe` mdList
