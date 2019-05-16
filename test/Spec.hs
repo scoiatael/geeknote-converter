@@ -63,6 +63,12 @@ main = hspec $ do
     it "converts sub-sub-header" $
       toEnNoteBody "### A header\n" `shouldBe`  "<h3>A header</h3>\n"
 
+    it "converts bold" $
+      toEnNoteBody "**bold**\n" `shouldBe`  "<p><strong>bold</strong></p>\n"
+
+    it "converts italic" $
+      toEnNoteBody "*bold*\n" `shouldBe`  "<p><emph>bold</emph></p>\n"
+
   describe "fromEnNote" $ do
     it "converts unordered list" $ do
       fromEnNote (note xmlList) `shouldBe` mdList
@@ -87,6 +93,12 @@ main = hspec $ do
 
     it "converts sub-sub-header" $
       fromEnNote (note "<h3>A header</h3>\n")`shouldBe` "### A header\n"
+
+    it "converts bold" $
+      fromEnNote (note  "<p><strong>bold</strong></p>\n") `shouldBe` "**bold**\n"
+
+    it "converts italic" $
+      fromEnNote (note  "<p><emph>bold</emph></p>\n") `shouldBe` "*bold*\n"
 
   describe "examples" $ do
     let examplesDir = "test/examples"
