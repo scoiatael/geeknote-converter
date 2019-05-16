@@ -28,11 +28,14 @@ goNode (XML.NodeElement e) = goElem e
 goNode (XML.NodeContent "\n") = return []
 goNode (XML.NodeContent t) = buildWithPrefix <$> State.get >>= resetState
   where
+    buildWithPrefix "" =
+      [textNode]
     buildWithPrefix pre =
         [ CMark.Node Nothing (CMark.CUSTOM_INLINE pre "") []
-        , CMark.Node Nothing (CMark.TEXT t) []
+        , textNode
         ]
     resetState v = State.put "" >> return v
+    textNode = CMark.Node Nothing (CMark.TEXT t) []
 goNode (XML.NodeComment _) = return []
 goNode (XML.NodeInstruction _) = return []
 
@@ -46,7 +49,7 @@ goElem (XML.Element "ul" _attrs children) =
 goElem (XML.Element "li" _attrs children) =
   return . CMark.Node Nothing CMark.ITEM . return . CMark.Node Nothing CMark.PARAGRAPH . concat <$> mapM goNode children
 goElem (XML.Element "strong" _attrs children) =
-  return . CMark.Node Nothing CMark.PARAGRAPH . return . CMark.Node Nothing CMark.STRONG . concat <$> mapM goNode children
+  return . CMark.Node Nothing CMark.STRONG . concat <$> mapM goNode children
 goElem (XML.Element "en-todo" attrs _children) | "checked" `M.lookup` attrs == Just "true" = State.put "[x]" >> return []
 goElem (XML.Element "en-todo" _attrs _children) = State.put "[ ]" >> return []
 goElem (XML.Element maybeHeader _attrs children) | maybeHeader `elem` headings =

@@ -64,7 +64,7 @@ main = hspec $ do
       toEnNoteBody "### A header\n" `shouldBe`  "<h3>A header</h3>\n"
 
     it "converts bold" $
-      toEnNoteBody "**bold**\n" `shouldBe`  "<strong>bold</strong>\n"
+      toEnNoteBody "**bold**\n" `shouldBe`  "<p><strong>bold</strong></p>\n"
 
   describe "fromEnNote" $ do
     it "converts unordered list" $ do
@@ -92,7 +92,7 @@ main = hspec $ do
       fromEnNote (note "<h3>A header</h3>\n")`shouldBe` "### A header\n"
 
     it "converts bold" $
-      fromEnNote (note  "<strong>bold</strong>\n") `shouldBe` "**bold**\n"
+      fromEnNote (note  "<p><strong>bold</strong></p>\n") `shouldBe` "**bold**\n"
 
   describe "examples" $ do
     let examplesDir = "test/examples"
