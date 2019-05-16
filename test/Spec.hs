@@ -3,6 +3,8 @@
 import Test.Hspec
 import Text.RawString.QQ
 import qualified Data.Text as T
+import System.Directory(listDirectory)
+import Control.Monad(void)
 
 import Lib
 
@@ -12,7 +14,7 @@ prelude = [r|<?xml version="1.0" encoding="UTF-8"?>
 |]
 
 emptyDoc :: Enml
-emptyDoc = T.concat [prelude, [r|<en-note></en-note>|], "\n"]
+emptyDoc = T.concat [prelude, [r|<en-note>|], "\n", [r|</en-note>|], "\n"]
 
 xmlList :: Enml
 xmlList = "<ul>\n<li>1</li>\n<li>2</li>\n<li>3</li>\n</ul>\n"
@@ -85,3 +87,18 @@ main = hspec $ do
 
     it "converts sub-sub-header" $
       fromEnNote (note "<h3>A header</h3>\n")`shouldBe` "### A header\n"
+
+  describe "examples" $ do
+    let examplesDir = "test/examples"
+    examples <- runIO $ listDirectory examplesDir
+
+    let testExample = \example -> do
+          let readToText fname = T.pack <$> (runIO $ readFile $ examplesDir ++ "/" ++ example ++ "/" ++ fname)
+          md <- readToText "test.md"
+          xml <- readToText "test.xml"
+
+          it ("works for " ++ example) $ do
+            toEnml md `shouldBe` xml
+            fromEnml xml `shouldBe` md
+
+    void $ mapM testExample examples
