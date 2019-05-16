@@ -41,6 +41,7 @@ convert (Node _pos (LIST _lsAttr) children) = State.withStateT (const InBlock) c
   where
     conversion = T.concat . (["<ul>\n"]++) .  (++ ["</ul>\n"]) <$> mapM convert children
 convert (Node _pos ITEM children) = T.concat . (["<li>"]++) .  (++ ["</li>\n"]) <$> mapM convert children
+convert (Node _pos STRONG children) = State.withStateT (const InBlock) $ T.concat . (["<strong>"]++) .  (++ ["</strong>\n"]) <$> mapM convert children
 convert (Node _pos (HEADING level) children) =
   T.concat . ([openTag]++) .  (++ [closeTag]) <$> mapM convert children
   where
