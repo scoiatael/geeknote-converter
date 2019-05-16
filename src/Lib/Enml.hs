@@ -50,6 +50,8 @@ goElem (XML.Element "li" _attrs children) =
   return . CMark.Node Nothing CMark.ITEM . return . CMark.Node Nothing CMark.PARAGRAPH . concat <$> mapM goNode children
 goElem (XML.Element "strong" _attrs children) =
   return . CMark.Node Nothing CMark.STRONG . concat <$> mapM goNode children
+goElem (XML.Element "emph" _attrs children) =
+  return . CMark.Node Nothing CMark.EMPH . concat <$> mapM goNode children
 goElem (XML.Element "en-todo" attrs _children) | "checked" `M.lookup` attrs == Just "true" = State.put "[x]" >> return []
 goElem (XML.Element "en-todo" _attrs _children) = State.put "[ ]" >> return []
 goElem (XML.Element maybeHeader _attrs children) | maybeHeader `elem` headings =
