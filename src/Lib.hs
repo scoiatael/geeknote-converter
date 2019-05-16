@@ -36,7 +36,7 @@ enmlDoctype :: Enml
 enmlDoctype = [r|<!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd">|]
 
 openEnNote :: Enml
-openEnNote = [r|<en-note>|]
+openEnNote = [r|<en-note>|] `T.append` "\n"
 
 closeEnNote :: Enml
 closeEnNote = [r|</en-note>|]
