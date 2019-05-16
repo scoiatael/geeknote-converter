@@ -2,5 +2,5 @@
 <!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd">
 <en-note>
 <h1>Welcome</h1>
-<p>This is some <emph>bold</emph> text.</p>
+<p>This is some <emph>emphasized</emph> text.</p>
 </en-note>

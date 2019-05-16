@@ -1,3 +1,3 @@
 # Welcome
 
-This is some *bold* text.
+This is some *emphasized* text.
