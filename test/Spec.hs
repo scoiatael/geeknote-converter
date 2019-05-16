@@ -67,7 +67,7 @@ main = hspec $ do
       toEnNoteBody "**bold**\n" `shouldBe`  "<p><strong>bold</strong></p>\n"
 
     it "converts italic" $
-      toEnNoteBody "*bold*\n" `shouldBe`  "<p><emph>bold</emph></p>\n"
+      toEnNoteBody "*emphasized*\n" `shouldBe`  "<p><emph>emphasized</emph></p>\n"
 
   describe "fromEnNote" $ do
     it "converts unordered list" $ do
@@ -98,7 +98,7 @@ main = hspec $ do
       fromEnNote (note  "<p><strong>bold</strong></p>\n") `shouldBe` "**bold**\n"
 
     it "converts italic" $
-      fromEnNote (note  "<p><emph>bold</emph></p>\n") `shouldBe` "*bold*\n"
+      fromEnNote (note  "<p><emph>emphasized</emph></p>\n") `shouldBe` "*emphasized*\n"
 
   describe "examples" $ do
     let examplesDir = "test/examples"
