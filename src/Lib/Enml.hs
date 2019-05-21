@@ -7,7 +7,7 @@ import qualified Data.Map as M
 import Data.Text(Text)
 import qualified CMark
 import qualified Text.XML as XML
-import Data.Maybe(fromJust)
+import Data.Maybe(fromJust, fromMaybe)
 import Data.List(elemIndex)
 
 import Control.Monad.Trans.State.Strict(evalStateT, StateT)
@@ -60,4 +60,7 @@ goElem (XML.Element maybeHeader _attrs children) | maybeHeader `elem` headings =
     -- 'elem' guard checks that fromJust can be applied safely
     level = (1+) . fromJust $ elemIndex maybeHeader headings
 goElem (XML.Element "p" _attrs children) = return . CMark.Node Nothing CMark.PARAGRAPH . concat <$> mapM goNode children
+goElem (XML.Element "a" attrs children) = return . CMark.Node Nothing (CMark.LINK url "") . concat <$> mapM goNode children
+  where
+    url = "" `fromMaybe` M.lookup "href" attrs
 goElem (XML.Element _name _attrs children) = concat <$> mapM goNode children

@@ -4,7 +4,6 @@ import Test.Hspec
 import Text.RawString.QQ
 import qualified Data.Text as T
 import System.Directory(listDirectory)
-import Control.Monad(void)
 
 import Lib
 
@@ -33,11 +32,11 @@ note inner = (T.concat ["<en-note>", inner, "</en-note>"])
 
 main :: IO ()
 main = hspec $ do
-  describe "toENML" $ do
+  describe "toENML" $
     it "returns body wrapped in ENML" $
       toEnml "\n" `shouldBe` emptyDoc
 
-  describe "fromEnml" $ do
+  describe "fromEnml" $
     it "parses empty note" $
       fromEnml emptyDoc `shouldBe` "\n"
 
@@ -69,8 +68,11 @@ main = hspec $ do
     it "converts italic" $
       toEnNoteBody "*emphasized*\n" `shouldBe`  "<p><emph>emphasized</emph></p>\n"
 
+    it "converts links" $
+      toEnNoteBody "[example](http://example.test)\n"  `shouldBe` "<p><a href=\"http://example.test\" title=\"\">example</a></p>\n"
+
   describe "fromEnNote" $ do
-    it "converts unordered list" $ do
+    it "converts unordered list" $
       fromEnNote (note xmlList) `shouldBe` mdList
 
     it "converts paragraph" $
@@ -100,17 +102,20 @@ main = hspec $ do
     it "converts italic" $
       fromEnNote (note  "<p><emph>emphasized</emph></p>\n") `shouldBe` "*emphasized*\n"
 
+    it "converts links" $
+      fromEnNote (note  "<p><a href='http://example.test'>example</a></p>\n") `shouldBe` "[example](http://example.test)\n"
+
   describe "examples" $ do
     let examplesDir = "test/examples"
     examples <- runIO $ listDirectory examplesDir
 
-    let testExample = \example -> do
-          let readToText fname = T.pack <$> (runIO $ readFile $ examplesDir ++ "/" ++ example ++ "/" ++ fname)
+    let testExample exampleFolder = do
+          let readToText fname = T.pack <$> runIO ( readFile $ examplesDir ++ "/" ++ exampleFolder ++ "/" ++ fname)
           md <- readToText "test.md"
           xml <- readToText "test.xml"
 
-          it ("works for " ++ example) $ do
+          it ("works for " ++ exampleFolder) $ do
             toEnml md `shouldBe` xml
             fromEnml xml `shouldBe` md
 
-    void $ mapM testExample examples
+    mapM_ testExample examples
