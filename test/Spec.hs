@@ -107,7 +107,7 @@ main = hspec $ do
     examples <- runIO $ listDirectory examplesDir
 
     let testExample exampleFolder = do
-          let readToText fname = T.pack <$> (runIO $ readFile $ examplesDir ++ "/" ++ exampleFolder ++ "/" ++ fname)
+          let readToText fname = T.pack <$> runIO ( readFile $ examplesDir ++ "/" ++ exampleFolder ++ "/" ++ fname)
           md <- readToText "test.md"
           xml <- readToText "test.xml"
 
