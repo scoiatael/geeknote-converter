@@ -49,4 +49,5 @@ convert (Node _pos (HEADING level) children) =
     tag = T.concat ["h", T.pack $ show level]
     openTag = T.concat ["<", tag, ">"]
     closeTag = T.concat ["</", tag, ">\n"]
+convert (Node _pos (LINK url link) children) = T.concat . (["<a href='", url, "' title='", link, "'>"]++) .  (++ ["</a>"]) <$> mapM convert children
 convert (Node _pos _type children) = T.concat <$> mapM convert children

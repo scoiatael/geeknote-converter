@@ -68,6 +68,9 @@ main = hspec $ do
     it "converts italic" $
       toEnNoteBody "*emphasized*\n" `shouldBe`  "<p><emph>emphasized</emph></p>\n"
 
+    it "converts links" $
+      toEnNoteBody "[example](http://example.test)\n"  `shouldBe` "<p><a href='http://example.test' title=''>example</a></p>\n"
+
   describe "fromEnNote" $ do
     it "converts unordered list" $
       fromEnNote (note xmlList) `shouldBe` mdList
