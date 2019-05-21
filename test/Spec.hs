@@ -99,6 +99,9 @@ main = hspec $ do
     it "converts italic" $
       fromEnNote (note  "<p><emph>emphasized</emph></p>\n") `shouldBe` "*emphasized*\n"
 
+    it "converts links" $
+      fromEnNote (note  "<p><a href='http://example.test'>example</a></p>\n") `shouldBe` "[example](http://example.test)\n"
+
   describe "examples" $ do
     let examplesDir = "test/examples"
     examples <- runIO $ listDirectory examplesDir
