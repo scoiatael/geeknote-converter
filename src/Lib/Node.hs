@@ -51,4 +51,17 @@ convert (Node _pos (HEADING level) children) =
     closeTag = T.concat ["</", tag, ">\n"]
 convert (Node _pos (LINK url link) children) = T.concat . (["<a href=\"", url, "\" title=\"", link, "\">"]++) .  (++ ["</a>"]) <$> mapM convert children
 convert (Node _ (IMAGE url _) [Node _ (TEXT link) []]) = return . T.concat . (["<img src=\"", url, "\" alt=\"", link, "\">"]++) .  (++ ["</img>"]) $ []
+convert (Node _pos BLOCK_QUOTE children) =  enquote <$> withBlankState transformedChildren
+  where
+    enquote = T.concat . (["<blockquote>"]++) .  (++ ["</blockquote>"])
+    withBlankState = withLocalState (const Blank)
+    transformedChildren = mapM convert children
 convert (Node _pos _type children) = T.concat <$> mapM convert children
+
+withLocalState ::  Monad m => (s -> s) -> StateT s m a -> StateT s m a
+withLocalState t m = do
+  s' <- State.get
+  State.put (t s')
+  a <- m
+  State.put s'
+  return a

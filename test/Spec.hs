@@ -74,6 +74,9 @@ main = hspec $ do
     it "converts images" $
       toEnNoteBody "![a cat](http://placekitten.com/200/300)" `shouldBe` "<p><img src=\"http://placekitten.com/200/300\" alt=\"a cat\"></img></p>\n"
 
+    it "converts quotes" $
+      toEnNoteBody "> ![a cat](http://placekitten.com/200/300)" `shouldBe` "<blockquote><p><img src=\"http://placekitten.com/200/300\" alt=\"a cat\"></img></p>\n</blockquote>"
+
   describe "fromEnNote" $ do
     it "converts unordered list" $
       fromEnNote (note xmlList) `shouldBe` mdList
@@ -110,6 +113,9 @@ main = hspec $ do
 
     it "converts images" $
       fromEnNote (note  "<p><img src=\"http://placekitten.com/200/300\" alt=\"a cat\"></img></p>\n") `shouldBe` "![a cat](http://placekitten.com/200/300)\n"
+
+    it "converts quotes" $
+      fromEnNote (note "<blockquote><p><img src=\"http://placekitten.com/200/300\" alt=\"a cat\"></img></p>\n</blockquote>") `shouldBe`"> ![a cat](http://placekitten.com/200/300)\n"
 
   describe "examples" $ do
     let examplesDir = "test/examples"
