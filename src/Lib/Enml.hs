@@ -63,4 +63,8 @@ goElem (XML.Element "p" _attrs children) = return . CMark.Node Nothing CMark.PAR
 goElem (XML.Element "a" attrs children) = return . CMark.Node Nothing (CMark.LINK url "") . concat <$> mapM goNode children
   where
     url = "" `fromMaybe` M.lookup "href" attrs
+goElem (XML.Element "img" attrs _) = return . return $ CMark.Node Nothing (CMark.IMAGE url "") [CMark.Node Nothing (CMark.TEXT alt) []]
+  where
+    url = "" `fromMaybe` M.lookup "src" attrs
+    alt = "" `fromMaybe` M.lookup "alt" attrs
 goElem (XML.Element _name _attrs children) = concat <$> mapM goNode children
