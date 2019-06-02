@@ -33,3 +33,5 @@ deploy:
   on:
     repo: scoiatael/geeknote-converter
     branch: master
+    on:
+      os: osx
