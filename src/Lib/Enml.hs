@@ -67,4 +67,6 @@ goElem (XML.Element "img" attrs _) = return . return $ CMark.Node Nothing (CMark
   where
     url = "" `fromMaybe` M.lookup "src" attrs
     alt = "" `fromMaybe` M.lookup "alt" attrs
+goElem (XML.Element "blockquote" _attrs children) =
+  return . CMark.Node Nothing CMark.BLOCK_QUOTE . concat <$> mapM goNode children
 goElem (XML.Element _name _attrs children) = concat <$> mapM goNode children
