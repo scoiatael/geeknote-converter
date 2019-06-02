@@ -71,6 +71,9 @@ main = hspec $ do
     it "converts links" $
       toEnNoteBody "[example](http://example.test)\n"  `shouldBe` "<p><a href=\"http://example.test\" title=\"\">example</a></p>\n"
 
+    it "converts images" $
+      toEnNoteBody "![a cat](http://placekitten.com/200/300)" `shouldBe` "<p><img src=\"http://placekitten.com/200/300\" alt=\"a cat\"></img></p>\n"
+
   describe "fromEnNote" $ do
     it "converts unordered list" $
       fromEnNote (note xmlList) `shouldBe` mdList
@@ -104,6 +107,9 @@ main = hspec $ do
 
     it "converts links" $
       fromEnNote (note  "<p><a href='http://example.test'>example</a></p>\n") `shouldBe` "[example](http://example.test)\n"
+
+    it "converts images" $
+      fromEnNote (note  "<p><img src=\"http://placekitten.com/200/300\" alt=\"a cat\"></img></p>\n") `shouldBe` "![a cat](http://placekitten.com/200/300)\n"
 
   describe "examples" $ do
     let examplesDir = "test/examples"

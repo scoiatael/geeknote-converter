@@ -9,7 +9,7 @@ cache:
 before_install:
   - mkdir -p ~/.local/bin
   - export PATH=~/.local/bin:$PATH
-  - if [! -f $HOME/.local/bin/stack ]; then travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar -xzO --wildcards '*/stack' > ~/.local/bin/stack; fi
+  - if [ ! -f $HOME/.local/bin/stack ]; then travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar -xzO --wildcards '*/stack' > ~/.local/bin/stack; fi
   - chmod a+x ~/.local/bin/stack
 
 install:
