@@ -1,3 +1,3 @@
-# Changelog for geeknote-hs
+# Changelog for geeknote-converter
 
 ## Unreleased changes
