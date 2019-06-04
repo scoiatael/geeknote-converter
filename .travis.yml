@@ -24,9 +24,9 @@ script:
 before_deploy:
   - git config --local user.name "scoiatael"
   - git config --local user.email "czapl.luk+git@gmail.com"
-  - export TRAVIS_TAG=${TRAVIS_TAG:-$(ruby -ryaml -e "puts YAML.load_file('package.yaml').fetch('version')")}
+  - export TRAVIS_TAG=${TRAVIS_TAG:-v$(ruby -ryaml -e "puts YAML.load_file('package.yaml').fetch('version')")}
   - git tag $TRAVIS_TAG
-  - cp $(stack exec -- which geeknote-converter) geeknote-converter
+  - cp $(stack exec -- which geeknote-converter) geeknote-converter-$TRAVIS_OS_NAME
   - export RELEASE_TITLE=$(date '+%Y%m%d%H%M%S')-$(echo "$TRAVIS_COMMIT_MESSAGE" | tail -n 1)
 deploy:
   name: $RELEASE_TITLE
@@ -35,9 +35,7 @@ deploy:
   provider: releases
   api_key:
     secure: WJhOroaCpFTfw8dAhe3A9ZoA6hEmQSZQii8EBg93u/1PUJnaErhY4S/E5dS/Sr/Hlpns9m086hvtUEO337Dg6BPvFXJ8xpPOeFfebvzzwctwKqkHFHRZj50eIcxWSbAkPk7fzEdSbbkURfPLZtqE2UFLM2XvQ5YlOFx3Vh8sS5QXrR+yBNedAuDYLCoM+NkUUfiegcT/mohakvZACl9yQpN5z05IpwA4qnlmOSougpEFmrcQTRhp9TPyoR6QR61+0cKCfzUvkL0JuKLE38p0QIC3ILaUyxvUMfldBsUe9fjhlvAuAo6QBa2WnqqKzTJ8CRz57z6DCM56EnqaSM9hRnSINiItTkXIVEV50d9fLcJnpzeULdScYhA/5MANcdnvntn1WzfFP005OHvoO5H5b7XSPKc+sk6bLEvhm1rjiEYq7utA6oGXgMn20iVZkAQs6LwMaQEvndRCPja7ANZy6vYSJfcL2REUaClPFQaB6PKaCuUXL1JoD+jvawNrOEEOLmQLNd4yVAPEII8/g6GauTWKuRuVRT/ObonuYeytKCe/tATKcRORMKvePyTztOii2JmWVxOyOSAUOJhklpfxWauHjV45JfJsMMWxKJwXx3bXVUAfO81zLxatNUcBSXVuaz6p1bPKD8Xoy15K/i+S/puljVscVHswqIRLoxOf54k=
-  file: geeknote-converter
+  file: geeknote-converter-$TRAVIS_OS_NAME
   on:
     repo: scoiatael/geeknote-converter
     branch: master
-    on:
-      os: osx
